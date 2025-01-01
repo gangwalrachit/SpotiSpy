@@ -1,0 +1,15 @@
+# Python-specific files
+spotispy/__pycache__/
+.cache
+
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# IDE/editor-specific
+.vscode/
+
+# macOS-specific
+.DS_Store
