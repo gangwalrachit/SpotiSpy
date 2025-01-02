@@ -3,14 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to Your Spotify Dashboard</title>
+    <title>SpotiSpy</title>
+    <style>
+      img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: block;
+        margin: 10px auto;
+      }
+      .profile-link {
+        text-align: center;
+        margin-top: 10px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Welcome to Your Spotify Dashboard</h1>
+    <h1>Welcome to SpotiSpy</h1>
 
     {% if authenticated %}
-    <p>Hello, {{ user_id }}! You are logged in.</p>
+    <p>Hello, {{ user_name }}!</p>
+
+    <!-- Display user profile picture -->
+    {% if user_pfp %}
+    <img src="{{ user_pfp }}" alt="Profile Picture of {{ user_name }}" />
+    {% endif %}
+
+    <!-- Display link to user's Spotify profile -->
+    {% if user_profile_url %}
+    <p class="profile-link">
+      <a href="{{ user_profile_url }}" target="_blank">View Spotify Profile</a>
+    </p>
+    {% endif %}
+
+    <!-- Link to view top tracks and artists -->
     <p><a href="/top/{{ user_id }}">View Your Top Tracks and Artists</a></p>
+
     <!-- Optional: Add log-out functionality here -->
     {% else %}
     <p>Please log in to start viewing your top tracks and artists.</p>
