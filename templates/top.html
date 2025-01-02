@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Top Tracks and Artists</title>
+    <style>
+        img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Your Top Tracks and Artists</h1>
@@ -18,17 +27,23 @@
         <button type="submit">Get Top Tracks & Artists</button>
     </form>
 
-    <h2>Top Tracks ({{ time_range }}):</h2>
+    <h2>Top Tracks:</h2>
     <ul>
         {% for track in top_tracks %}
-            <li>{{ track.name }} by {{ track.artists[0].name }}</li>
+        <li>
+            <img src="{{ track.album.images[0].url }}" alt="{{ track.name }} album cover">
+            {{ track.name }} by {{ track.artists[0].name }}
+        </li>
         {% endfor %}
     </ul>
 
-    <h2>Top Artists ({{ time_range }}):</h2>
+    <h2>Top Artists:</h2>
     <ul>
         {% for artist in top_artists %}
-            <li>{{ artist.name }}</li>
+            <li>
+                <img src="{{ artist.images[0].url }}" alt="{{ artist.name }}'s image">
+                {{ artist.name }}
+            </li>
         {% endfor %}
     </ul>
 </body>
