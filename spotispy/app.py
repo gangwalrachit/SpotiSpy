@@ -82,13 +82,14 @@ async def callback(request: Request) -> RedirectResponse:
 
     :param request: FastAPI Request object
     :return: RedirectResponse to the user's top tracks page
+    :raises: HTTPException if the authorization code is missing
     """
     # Get authorization code from the query parameters
     code = request.query_params.get("code")
     if not code:
         raise HTTPException(status_code=400, detail="Authorization code missing")
 
-    # Exchange the authorization code for an access token
+    # Get the access token using the authorization code
     token_info = sp_oauth.get_access_token(code)
 
     # Initialize Spotify client with the access token
@@ -108,7 +109,9 @@ async def callback(request: Request) -> RedirectResponse:
     return RedirectResponse(url="/top")
 
 
-@app.get("/top", response_model=None, response_class=HTMLResponse)
+@app.get(
+    "/top", response_model=None, response_class=Union[HTMLResponse, RedirectResponse]
+)
 async def top(
     request: Request,
     time_range: str = "short_term",
@@ -118,9 +121,13 @@ async def top(
     Displays the user's top tracks and artists for a given time range.
 
     :param request: FastAPI Request object
-    :param time_range: Time range for fetching top tracks and artists (short_term, medium_term, long_term)
+    :param time_range: Time range for fetching top tracks and artists:
+        - short_term
+        - medium_term
+        - long_term
     :param limit: Number of top tracks and artists to display
     :return: Rendered HTML template with the user's top tracks and artists
+    :raises: HTTPException if the time range is invalid
     """
     # Fetch user_id from the session
     user_id = request.session.get("user_id")
