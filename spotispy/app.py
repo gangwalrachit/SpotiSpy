@@ -1,21 +1,25 @@
 import os
 from typing import Union
 
-from fastapi import FastAPI, Depends, Request, HTTPException
-from fastapi.responses import RedirectResponse, JSONResponse, HTMLResponse
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from spotipy import Spotify
+from starlette.middleware.sessions import SessionMiddleware
 
-from spotispy.config import sp_oauth
+from spotispy.config import sp_oauth, SESSION_SECRET_KEY
 
-# FastAPI app setup
+# Initialize FastAPI app
 app = FastAPI()
 
-# Template setup
+# Add session middleware for user authentication
+app.add_middleware(SessionMiddleware, secret_key="SESSION_SECRET_KEY")
+
+# Setup Jinja2 templates for rendering HTML pages
 templates = Jinja2Templates(directory="templates")
 
-# In-memory store for user tokens
-# TODO: replace this with a proper database)
+# In-memory store for user tokens and data
+# TODO: replace this with a proper database
 data_store = {}
 
 
@@ -23,110 +27,130 @@ data_store = {}
 async def index(request: Request) -> HTMLResponse:
     """
     Home page view with login option.
+    If the user is authenticated, display personalized content;
+    otherwise, show the login button.
 
     :param request: FastAPI Request object
-    :return: HTMLResponse with the rendered template
+    :return: Rendered HTML template
     """
-    # Check if user is authenticated (if their user_id is in data_store)
-    user_id = next(iter(data_store), None)  # Get the first user_id if exists
+    # Fetch user_id from the session
+    user_id = request.session.get("user_id")
 
-    # If user is authenticated, display a personalized greeting
-    if user_id:
-        user_info = data_store[user_id].get("user_info", {})
+    if user_id and user_id in data_store:
+        # Fetch user-specific information
+        user_info = data_store[user_id]["user_info"]
         user_name = user_info.get("display_name", user_id)
         user_pfp = user_info.get("images", [{}])[0].get("url")
         user_profile_url = user_info.get("external_urls", {}).get("spotify")
 
+        # Render the template with personalized content
         return templates.TemplateResponse(
             "index.html",
             {
                 "request": request,
-                "user_id": user_id,
                 "user_name": user_name,
                 "user_pfp": user_pfp,
                 "user_profile_url": user_profile_url,
                 "authenticated": True,
             },
         )
-    # Else show a login button
+
+    # Render the template with login option for unauthenticated users
     return templates.TemplateResponse(
         "index.html",
         {"request": request, "authenticated": False},
     )
 
 
-@app.get("/login")
+@app.get("/login", response_class=RedirectResponse)
 async def login() -> RedirectResponse:
     """
-    Redirect user to Spotify's login page.
+    Redirects the user to Spotify's login page to authenticate.
 
     :return: RedirectResponse to Spotify's login URL
     """
+    # Generate Spotify's authorization URL
     auth_url = sp_oauth.get_authorize_url()
     return RedirectResponse(auth_url)
 
 
-@app.get("/callback", response_model=None)
-async def callback(request: Request) -> Union[RedirectResponse, JSONResponse]:
+@app.get("/callback", response_class=RedirectResponse)
+async def callback(request: Request) -> RedirectResponse:
     """
-    Callback view to handle authorization code from Spotify.
+    Handles the callback from Spotify after the user logs in.
+    Saves the user token and user information in the session and redirects to the top tracks page.
 
     :param request: FastAPI Request object
-    :return: RedirectResponse to the user's top tracks page or JSONResponse in case of error
+    :return: RedirectResponse to the user's top tracks page
+    :raises: HTTPException if the authorization code is missing
     """
+    # Get authorization code from the query parameters
     code = request.query_params.get("code")
     if not code:
-        return JSONResponse(
-            {"error": "Authorization code missing in the query parameters"}
-        )
+        raise HTTPException(status_code=400, detail="Authorization code missing")
 
-    # Get the access token using the code
+    # Get the access token using the authorization code
     token_info = sp_oauth.get_access_token(code)
 
     # Initialize Spotify client with the access token
     sp = Spotify(auth=token_info["access_token"])
 
-    # Fetch user info to get user_id
+    # Fetch user information
     user_info = sp.me()
     user_id = user_info["id"]
 
-    # Store token info & user info under user_id in data_store
-    data_store[user_id] = token_info
-    data_store[user_id]["user_info"] = user_info
+    # Store user token and information in the data_store
+    data_store[user_id] = {"token_info": token_info, "user_info": user_info}
 
-    # Redirect to the top tracks and artists page
-    return RedirectResponse(url=f"/top/{user_id}")
+    # Save user_id in the session for authentication
+    request.session["user_id"] = user_id
+
+    # Redirect to the top tracks page
+    return RedirectResponse(url="/top")
 
 
-@app.get("/top/{user_id}", response_model=None, response_class=HTMLResponse)
+@app.get(
+    "/top", response_model=None, response_class=Union[HTMLResponse, RedirectResponse]
+)
 async def top(
-    request: Request, user_id: str, time_range: str = "short_term"
+    request: Request,
+    time_range: str = "short_term",
+    limit: int = 5,
 ) -> Union[HTMLResponse, RedirectResponse]:
     """
-    Display user's top tracks and artists.
+    Displays the user's top tracks and artists for a given time range.
 
     :param request: FastAPI Request object
-    :param user_id: Spotify User ID
-    :param time_range: Time range for top tracks and artists. Options:
-        - short_term: Last 4 weeks
-        - medium_term: Last 6 months
-        - long_term: All time
-    :return: HTMLResponse with the rendered template or RedirectResponse to the login page
+    :param time_range: Time range for fetching top tracks and artists:
+        - short_term
+        - medium_term
+        - long_term
+    :param limit: Number of top tracks and artists to display
+    :return: Rendered HTML template with the user's top tracks and artists
+    :raises: HTTPException if the time range is invalid
     """
-    token_info = data_store.get(user_id)
-    if not token_info:
+    # Fetch user_id from the session
+    user_id = request.session.get("user_id")
+
+    if not user_id or user_id not in data_store:
+        # If the user is not authenticated, redirect to the login page
         return RedirectResponse(url="/login")
 
+    # Validate the requested time range
     if time_range not in ["short_term", "medium_term", "long_term"]:
         raise HTTPException(status_code=400, detail="Invalid time range")
 
+    # Fetch the user's token information
+    token_info = data_store[user_id]["token_info"]
+
+    # Initialize Spotify client with the access token
     sp = Spotify(auth=token_info["access_token"])
 
-    # Fetch top tracks and artists
-    limit = 5
+    # Fetch the user's top tracks and artists
     top_tracks = sp.current_user_top_tracks(limit=limit, time_range=time_range)
     top_artists = sp.current_user_top_artists(limit=limit, time_range=time_range)
 
+    # Render the template with top tracks and artists
     return templates.TemplateResponse(
         "top.html",
         {
