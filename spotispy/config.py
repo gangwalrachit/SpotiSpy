@@ -6,6 +6,9 @@ from spotipy.oauth2 import SpotifyOAuth
 # Load environment variables from .env file
 load_dotenv()
 
+# Session secret key for FastAPI app
+SESSION_SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
+
 # Spotify credentials and OAuth setup
 SPOTIFY_CLIENT_ID = os.getenv("CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = os.getenv("CLIENT_SECRET")
