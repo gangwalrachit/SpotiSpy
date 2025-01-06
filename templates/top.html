@@ -17,7 +17,7 @@
 <body>
     <h1>Your Top Tracks and Artists</h1>
 
-    <form method="get" action="/top/{{ user_id }}">
+    <form method="get" action="/top">
         <label for="time_range">Choose Time Range:</label>
         <select name="time_range" id="time_range">
             <option value="short_term" {% if time_range == 'short_term' %}selected{% endif %}>Last 4 Weeks</option>
