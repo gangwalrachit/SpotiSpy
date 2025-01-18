@@ -1,18 +1,17 @@
-import os
-
-from dotenv import load_dotenv
+from decouple import config
 from spotipy.oauth2 import SpotifyOAuth
 
-# Load environment variables from .env file
-load_dotenv()
 
 # Session secret key for FastAPI app
-SESSION_SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
+SESSION_SECRET_KEY = config("SESSION_SECRET_KEY")
+
+# Database details
+DATABASE_URL = config("DATABASE_URL", default="sqlite:///./spotispy.db")
 
 # Spotify credentials and OAuth setup
-SPOTIFY_CLIENT_ID = os.getenv("CLIENT_ID")
-SPOTIFY_CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-SPOTIFY_REDIRECT_URI = os.getenv("REDIRECT_URI")
+SPOTIFY_CLIENT_ID = config("CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = config("CLIENT_SECRET")
+SPOTIFY_REDIRECT_URI = config("REDIRECT_URI")
 SCOPE = "user-top-read"  # Scope to read user's top tracks and artists
 
 sp_oauth = SpotifyOAuth(
