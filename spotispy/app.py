@@ -75,8 +75,12 @@ async def index(request: Request, db: Session = Depends(get_db)) -> HTMLResponse
             # Fetch user-specific information
             user_info = user.user_info
             user_name = user_info.get("display_name", user_id)
-            user_pfp = user_info.get("images", [{}])[0].get("url")
             user_profile_url = user_info.get("external_urls", {}).get("spotify")
+
+            # Check if the user has profile images, if not, set a default placeholder
+            user_pfp = "https://via.placeholder.com/150"  # Default image
+            if user_info.get("images"):
+                user_pfp = user_info["images"][0].get("url", user_pfp)
 
             # Render the template with personalized content
             return templates.TemplateResponse(
@@ -84,8 +88,8 @@ async def index(request: Request, db: Session = Depends(get_db)) -> HTMLResponse
                 {
                     "request": request,
                     "user_name": user_name,
-                    "user_pfp": user_pfp,
                     "user_profile_url": user_profile_url,
+                    "user_pfp": user_pfp,
                     "authenticated": True,
                 },
             )
@@ -138,7 +142,7 @@ async def callback(request: Request, db: Session = Depends(get_db)) -> RedirectR
         raise HTTPException(status_code=400, detail="Authorization code missing")
 
     # Get the access token using the authorization code
-    token_info = sp_oauth.get_access_token(code)
+    token_info = sp_oauth.get_access_token(code, check_cache=False)
 
     # Initialize Spotify client with the access token
     sp = Spotify(auth=token_info["access_token"])
