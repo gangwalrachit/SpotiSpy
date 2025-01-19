@@ -109,6 +109,18 @@ async def login() -> RedirectResponse:
     return RedirectResponse(auth_url)
 
 
+@app.get("/logout", response_class=RedirectResponse)
+async def logout(request: Request) -> RedirectResponse:
+    """
+    Logs the user out by clearing the session and redirects to the home page.
+
+    :param request: FastAPI Request object
+    :return: RedirectResponse to the home page
+    """
+    request.session.pop("user_id", None)
+    return RedirectResponse(url="/")
+
+
 @app.get("/callback", response_class=RedirectResponse)
 async def callback(request: Request, db: Session = Depends(get_db)) -> RedirectResponse:
     """
@@ -135,10 +147,26 @@ async def callback(request: Request, db: Session = Depends(get_db)) -> RedirectR
     user_info = sp.me()
     user_id = user_info["id"]
 
-    # Store user token and information in the database
-    db_user = User(id=user_id, token_info=token_info, user_info=user_info)
-    db.add(db_user)
+    # Check if the user already exists in the database
+    existing_user = db.query(User).filter(User.id == user_id).first()
+
+    if existing_user:
+        # Update token_info and user_info for the existing user
+        existing_user.token_info = token_info
+        existing_user.user_info = user_info
+    else:
+        # Create a new user record
+        new_user = User(id=user_id, token_info=token_info, user_info=user_info)
+        db.add(new_user)
+
+    # Commit the changes to the database
     db.commit()
+
+    # Log all users in the database
+    users = db.query(User).all()
+    print("Current users in the database:")
+    for user in users:
+        print(f"ID:\t{user.id},\nUser Info:\t{user.user_info}")
 
     # Save user_id in the session for authentication
     request.session["user_id"] = user_id
