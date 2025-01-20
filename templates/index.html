@@ -6,15 +6,11 @@
     <title>SpotiSpy</title>
     <style>
       img {
-        width: 100px;
-        height: 100px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
-        display: block;
-        margin: 10px auto;
-      }
-      .profile-link {
-        text-align: center;
-        margin-top: 10px;
+        vertical-align: middle;
+        margin-right: 10px auto;
       }
     </style>
   </head>
@@ -31,16 +27,54 @@
 
     <!-- Display link to user's Spotify profile -->
     {% if user_profile_url %}
-    <p class="profile-link">
+    <p>
       <a href="{{ user_profile_url }}" target="_blank">View Spotify Profile</a>
     </p>
     {% endif %}
 
-    <!-- Link to view top tracks and artists -->
-    <p><a href="/top">View Your Top Tracks and Artists</a></p>
-
     <!-- Logout -->
     <a href="/logout">Logout</a>
+    <hr />
+    <h1>Your Top Tracks and Artists</h1>
+
+    <!-- Top tracks and artists -->
+    <form method="get" action="/">
+        <label for="time_range">Choose Time Range:</label>
+        <select name="time_range" id="time_range">
+            <option value="short_term" {% if time_range == "short_term" %}selected{% endif %}>Last 4 Weeks</option>
+            <option value="medium_term" {% if time_range == "medium_term" %}selected{% endif %}>Last 6 Months</option>
+            <option value="long_term" {% if time_range == "long_term" %}selected{% endif %}>All Time</option>
+        </select>
+
+        <label for="limit">Choose Number of Records:</label>
+        <select name="limit" id="limit">
+            <option value=5 {% if limit == 5 %}selected{% endif %}>5</option>
+            <option value=10 {% if limit == 10 %}selected{% endif %}>10</option>
+            <option value=15 {% if limit == 15 %}selected{% endif %}>15</option>
+        </select>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Top Tracks:</h2>
+    <ul>
+        {% for track in top_tracks %}
+        <li>
+            <img src="{{ track.album.images[0].url }}" alt="{{ track.name }} album cover">
+            {{ track.name }} by {{ track.artists[0].name }}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Top Artists:</h2>
+    <ul>
+        {% for artist in top_artists %}
+            <li>
+                <img src="{{ artist.images[0].url }}" alt="{{ artist.name }}'s image">
+                {{ artist.name }}
+            </li>
+        {% endfor %}
+    </ul>
 
     <!-- Optional: Add log-out functionality here -->
     {% else %}
