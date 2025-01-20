@@ -1,5 +1,6 @@
 # Python-specific files
 spotispy/__pycache__/
+spotispy/*/__pycache__/
 .cache
 
 # Virtual environment
