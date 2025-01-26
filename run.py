@@ -1,11 +1,11 @@
 import os
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from spotispy.config import SESSION_SECRET_KEY
 from spotispy.routers import auth, user
-
 
 # Initalize FastAPI app
 app = FastAPI()
@@ -14,6 +14,8 @@ app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY)
 # Include routers
 app.include_router(auth.router, tags=["auth"])
 app.include_router(user.router, tags=["user"])
+# Serve static files from static/ directory
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Use the PORT environment variable, default to 8000 for local development
 port = int(os.environ.get("PORT", 8000))
