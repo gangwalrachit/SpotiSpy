@@ -1,0 +1,208 @@
+/* General Styles */
+body {
+  background-color: #121212;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1db954;
+}
+
+/* Profile Container */
+.profile-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.profile-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Dropdown Menu */
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #232323;
+  border-radius: 10px;
+  width: 180px;
+  padding: 10px 0;
+  display: none; /* Initially hidden */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+.profile-container:hover .profile-dropdown {
+  display: block; /* Show on hover */
+}
+
+/* Dropdown Items */
+.profile-dropdown a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: white;
+  font-size: 0.95rem;
+  transition: background 0.2s ease;
+}
+
+.profile-dropdown a:hover {
+  background: #1db954;
+  border-radius: 5px;
+}
+
+/* Filters */
+.filters {
+  text-align: center;
+  background: #1c1c1c;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.filters-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.filters-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.dropdown,
+.btn {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: none;
+  font-size: 1rem;
+}
+
+.dropdown {
+  background: #232323;
+  color: white;
+}
+
+.btn {
+  background: #1db954;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Dashboard */
+.dashboard {
+  margin-top: 20px;
+}
+
+.dashboard-section {
+  background: #1c1c1c;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.dashboard-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.scrollable-box {
+  display: flex;
+  overflow-x: auto;
+  padding: 10px;
+  gap: 15px;
+}
+
+/* Card Styles */
+.card {
+  background: #232323;
+  padding: 10px;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 120px;
+  position: relative;
+}
+
+.card-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+/* Track Images: Rounded Square */
+.track .card-img {
+  border-radius: 15px;
+}
+
+/* Artist Images: Circle */
+.artist .card-img {
+  border-radius: 50%;
+}
+
+/* Ranking */
+.ranking-circle {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #1db954;
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  height: 8px; /* Adjust for horizontal scrolling */
+  width: 8px; /* Adjust for vertical scrolling */
+}
+
+::-webkit-scrollbar-track {
+  background: #1c1c1c;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1db954;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #17a34a;
+}
