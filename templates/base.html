@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpotiSpy{% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sp-green':   '#1ed760',
+                        'sp-black':   '#121212',
+                        'sp-surface': '#181818',
+                        'sp-card':    '#1f1f1f',
+                        'sp-muted':   '#b3b3b3',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-sp-black text-white font-sans min-h-screen">
+
+{% if authenticated %}
+
+<!-- ── SIDEBAR (md+) ─────────────────────────────────────────────── -->
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-52 bg-black flex-col p-6 z-20 border-r border-white/5">
+
+    <a href="/" class="text-sp-green text-xl font-bold tracking-wide mb-10 block">SpotiSpy</a>
+
+    <nav class="flex flex-col gap-0.5">
+        {% set nav = [
+            ('home',    '/',        'Profile',  'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'),
+            ('artists', '/artists', 'Artists',  'M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z'),
+            ('tracks',  '/tracks',  'Tracks',   'M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'),
+            ('albums',  '/albums',  'Albums',   'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z'),
+            ('genres',  '/genres',  'Genres',   'M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z')
+        ] %}
+        {% for page_id, href, label, icon_path in nav %}
+        <a href="{{ href }}"
+           class="flex items-center gap-3 py-2 px-3 rounded-md text-sm font-medium transition-colors
+                  {% if active_page == page_id %}text-white bg-sp-surface{% else %}text-sp-muted hover:text-white{% endif %}">
+            <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path d="{{ icon_path }}"/>
+            </svg>
+            {{ label }}
+        </a>
+        {% endfor %}
+    </nav>
+
+    <div class="mt-auto pt-6 border-t border-white/10">
+        <div class="flex items-center gap-3">
+            <img src="{{ user_pfp }}" alt="{{ user_name }}" class="w-8 h-8 rounded-full flex-shrink-0">
+            <div class="min-w-0">
+                <p class="text-sm font-semibold truncate">{{ user_name }}</p>
+                <a href="/logout" class="text-xs text-sp-muted hover:text-white transition-colors">Logout</a>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ── MAIN CONTENT ───────────────────────────────────────────────── -->
+<main class="md:ml-52 min-h-screen pb-20 md:pb-0">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ── BOTTOM NAV (mobile) ───────────────────────────────────────── -->
+<nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-white/10 flex justify-around py-3 md:hidden z-20">
+    {% for page_id, href, label, icon_path in nav %}
+    <a href="{{ href }}"
+       class="flex flex-col items-center gap-1 text-xs transition-colors
+              {% if active_page == page_id %}text-white{% else %}text-sp-muted{% endif %}">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="{{ icon_path }}"/>
+        </svg>
+        {{ label }}
+    </a>
+    {% endfor %}
+</nav>
+
+{% else %}
+
+<!-- ── LOGIN ─────────────────────────────────────────────────────── -->
+<div class="min-h-screen flex flex-col items-center justify-center gap-6 px-6 text-center">
+    <h1 class="text-5xl font-bold text-sp-green tracking-tight">SpotiSpy</h1>
+    <p class="text-sp-muted text-lg max-w-sm">Your Spotify stats — tracks, artists, albums, genres.</p>
+    <a href="/login"
+       class="mt-2 px-10 py-3 bg-sp-green text-black font-bold uppercase tracking-widest
+              rounded-full hover:brightness-110 transition-all">
+        Login with Spotify
+    </a>
+</div>
+
+{% endif %}
+
+</body>
+</html>

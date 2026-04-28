@@ -17,3 +17,6 @@ spotispy.db
 
 # macOS-specific
 .DS_Store
+
+# Local TLS certs (mkcert)
+*.pem

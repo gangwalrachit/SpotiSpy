@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %} — Top Tracks{% endblock %}
+
+{% block content %}
+
+<div class="px-6 md:px-12 py-10">
+
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-10">
+        <h1 class="text-2xl font-bold flex-1">Top Tracks</h1>
+        <div class="flex gap-2">
+            {% for value, label in [('short_term', '4 Weeks'), ('medium_term', '6 Months'), ('long_term', 'All Time')] %}
+            <a href="/tracks?time_range={{ value }}"
+               class="text-xs px-4 py-1.5 rounded-full border font-semibold uppercase tracking-wider transition-colors
+                      {% if time_range == value %}border-white text-white{% else %}border-white/20 text-sp-muted hover:text-white hover:border-white/40{% endif %}">
+                {{ label }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% for track in top_tracks %}
+    <div class="flex items-center gap-4 py-3 border-b border-white/5 last:border-0">
+        <img src="{{ track.album.images[0].url if track.album.images else '' }}"
+             alt="{{ track.name }}" class="w-10 h-10 rounded flex-shrink-0 object-cover">
+        <div class="min-w-0 flex-1">
+            <p class="font-medium truncate">{{ track.name }}</p>
+            <p class="text-sm text-sp-muted truncate mt-0.5">{{ track.artists[0].name }} · {{ track.album.name }}</p>
+        </div>
+        <span class="text-sm text-sp-muted flex-shrink-0 tabular-nums">{{ track.duration_ms | duration }}</span>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

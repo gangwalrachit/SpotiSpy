@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %} — Top Genres{% endblock %}
+
+{% block content %}
+
+<div class="px-6 md:px-12 py-10">
+
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-10">
+        <h1 class="text-2xl font-bold flex-1">Top Genres</h1>
+        <div class="flex gap-2">
+            {% for value, label in [('short_term', '4 Weeks'), ('medium_term', '6 Months'), ('long_term', 'All Time')] %}
+            <a href="/genres?time_range={{ value }}"
+               class="text-xs px-4 py-1.5 rounded-full border font-semibold uppercase tracking-wider transition-colors
+                      {% if time_range == value %}border-white text-white{% else %}border-white/20 text-sp-muted hover:text-white hover:border-white/40{% endif %}">
+                {{ label }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+        {% for genre in top_genres %}
+        <span class="flex items-center gap-2 px-4 py-2 border border-white/10 rounded-full text-sm capitalize
+                     {% if loop.index <= 5 %}text-white border-white/30{% else %}text-sp-muted{% endif %}">
+            {% if loop.index <= 3 %}
+            <span class="w-1.5 h-1.5 rounded-full bg-sp-green flex-shrink-0"></span>
+            {% endif %}
+            {{ genre.name }}
+        </span>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}
