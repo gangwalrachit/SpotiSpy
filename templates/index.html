@@ -4,18 +4,24 @@
 {% block content %}
 
 <!-- Profile header -->
-<div class="px-6 md:px-10 pt-10 pb-6 flex items-center justify-between gap-4">
-    <div>
-        <p class="text-sp-muted text-xs uppercase tracking-widest mb-1">Profile</p>
-        <h1 class="text-3xl font-bold">{{ user_name }}</h1>
+<div class="px-6 md:px-10 pt-10 pb-6 flex items-center justify-between gap-6">
+    <div class="flex items-center gap-3 min-w-0">
+        <img src="{{ user_pfp }}" alt="{{ user_name }}"
+             class="w-12 h-12 rounded-full flex-shrink-0 object-cover shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+        <a href="{{ user_profile_url }}" target="_blank"
+           class="text-3xl font-bold truncate hover:text-sp-green transition-colors duration-200">
+            {{ user_name }}
+        </a>
     </div>
-    {% if user_profile_url %}
-    <a href="{{ user_profile_url }}" target="_blank"
-       class="flex-shrink-0 px-5 py-2 border border-white/30 rounded-full text-xs font-semibold
-              uppercase tracking-widest text-sp-muted hover:border-white hover:text-white transition-colors duration-200">
-        Open Spotify
-    </a>
-    {% endif %}
+    <div class="flex gap-5 flex-shrink-0">
+        {% for value, label in [("short_term", "4 Weeks"), ("medium_term", "6 Months"), ("long_term", "All Time")] %}
+        <a href="/?time_range={{ value }}"
+           class="text-sm font-semibold pb-1 transition-colors duration-200 whitespace-nowrap
+                  {% if time_range == value %}text-white border-b-2 border-sp-green{% else %}text-sp-muted hover:text-white{% endif %}">
+            {{ label }}
+        </a>
+        {% endfor %}
+    </div>
 </div>
 
 <!-- Top Tracks -->
@@ -23,20 +29,36 @@
     <div class="flex items-center justify-between px-6 md:px-10 mb-4">
         <h2 class="text-xs font-bold uppercase tracking-widest">Top Tracks</h2>
         <a href="/tracks?time_range={{ time_range }}"
-           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">
-            See All
-        </a>
+           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">See All</a>
     </div>
-    <div class="flex gap-4 overflow-x-auto px-6 md:px-10 pb-2 scrollbar-hide">
-        {% for track in top_tracks %}
-        <div class="flex-shrink-0 w-32 group cursor-pointer">
-            <img src="{{ track.album.images[0].url if track.album.images else '' }}"
-                 alt="{{ track.name }}"
-                 class="w-32 h-32 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
-            <p class="text-xs font-medium truncate">{{ track.name }}</p>
-            <p class="text-[10px] text-sp-muted truncate mt-0.5">{{ track.artists[0].name }}</p>
+    <div class="relative">
+        <button id="tracks-left"
+                class="hidden absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10
+                       w-8 h-8 rounded-full bg-sp-black/90 border border-white/20 hover:border-white/50
+                       flex items-center justify-center shadow-lg transition-all duration-200"
+                onclick="scrollSection('tracks', -1)">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <div id="tracks-scroll"
+             class="flex gap-3 overflow-x-auto px-6 md:px-10 pb-3 scrollbar-hide"
+             onscroll="updateArrows('tracks')">
+            {% for track in top_tracks %}
+            <div class="flex-shrink-0 w-24 group cursor-pointer">
+                <img src="{{ track.album.images[0].url if track.album.images else '' }}"
+                     alt="{{ track.name }}"
+                     class="w-24 h-24 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
+                <p class="text-xs font-medium truncate">{{ track.name }}</p>
+                <p class="text-[10px] text-sp-muted truncate mt-0.5">{{ track.artists[0].name }}</p>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        <button id="tracks-right"
+                class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10
+                       w-8 h-8 rounded-full bg-sp-black/90 border border-white/20 hover:border-white/50
+                       flex items-center justify-center shadow-lg transition-all duration-200"
+                onclick="scrollSection('tracks', 1)">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </button>
     </div>
 </section>
 
@@ -45,19 +67,35 @@
     <div class="flex items-center justify-between px-6 md:px-10 mb-4">
         <h2 class="text-xs font-bold uppercase tracking-widest">Top Artists</h2>
         <a href="/artists?time_range={{ time_range }}"
-           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">
-            See All
-        </a>
+           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">See All</a>
     </div>
-    <div class="flex gap-4 overflow-x-auto px-6 md:px-10 pb-2 scrollbar-hide">
-        {% for artist in top_artists %}
-        <div class="flex-shrink-0 w-28 text-center group cursor-pointer">
-            <img src="{{ artist.images[0].url if artist.images else '' }}"
-                 alt="{{ artist.name }}"
-                 class="w-28 h-28 rounded-full object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
-            <p class="text-xs font-medium truncate">{{ artist.name }}</p>
+    <div class="relative">
+        <button id="artists-left"
+                class="hidden absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10
+                       w-8 h-8 rounded-full bg-sp-black/90 border border-white/20 hover:border-white/50
+                       flex items-center justify-center shadow-lg transition-all duration-200"
+                onclick="scrollSection('artists', -1)">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <div id="artists-scroll"
+             class="flex gap-4 overflow-x-auto px-6 md:px-10 pb-3 scrollbar-hide"
+             onscroll="updateArrows('artists')">
+            {% for artist in top_artists %}
+            <div class="flex-shrink-0 w-20 text-center group cursor-pointer">
+                <img src="{{ artist.images[0].url if artist.images else '' }}"
+                     alt="{{ artist.name }}"
+                     class="w-20 h-20 rounded-full object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
+                <p class="text-xs font-medium truncate">{{ artist.name }}</p>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        <button id="artists-right"
+                class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10
+                       w-8 h-8 rounded-full bg-sp-black/90 border border-white/20 hover:border-white/50
+                       flex items-center justify-center shadow-lg transition-all duration-200"
+                onclick="scrollSection('artists', 1)">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </button>
     </div>
 </section>
 
@@ -66,20 +104,36 @@
     <div class="flex items-center justify-between px-6 md:px-10 mb-4">
         <h2 class="text-xs font-bold uppercase tracking-widest">Top Albums</h2>
         <a href="/albums?time_range={{ time_range }}"
-           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">
-            See All
-        </a>
+           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">See All</a>
     </div>
-    <div class="flex gap-4 overflow-x-auto px-6 md:px-10 pb-2 scrollbar-hide">
-        {% for album in top_albums %}
-        <div class="flex-shrink-0 w-32 group cursor-pointer">
-            <img src="{{ album.image or '' }}"
-                 alt="{{ album.name }}"
-                 class="w-32 h-32 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
-            <p class="text-xs font-medium truncate">{{ album.name }}</p>
-            <p class="text-[10px] text-sp-muted truncate mt-0.5">{{ album.artist }}</p>
+    <div class="relative">
+        <button id="albums-left"
+                class="hidden absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10
+                       w-8 h-8 rounded-full bg-sp-black/90 border border-white/20 hover:border-white/50
+                       flex items-center justify-center shadow-lg transition-all duration-200"
+                onclick="scrollSection('albums', -1)">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <div id="albums-scroll"
+             class="flex gap-3 overflow-x-auto px-6 md:px-10 pb-3 scrollbar-hide"
+             onscroll="updateArrows('albums')">
+            {% for album in top_albums %}
+            <div class="flex-shrink-0 w-24 group cursor-pointer">
+                <img src="{{ album.image or '' }}"
+                     alt="{{ album.name }}"
+                     class="w-24 h-24 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
+                <p class="text-xs font-medium truncate">{{ album.name }}</p>
+                <p class="text-[10px] text-sp-muted truncate mt-0.5">{{ album.artist }}</p>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        <button id="albums-right"
+                class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10
+                       w-8 h-8 rounded-full bg-sp-black/90 border border-white/20 hover:border-white/50
+                       flex items-center justify-center shadow-lg transition-all duration-200"
+                onclick="scrollSection('albums', 1)">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </button>
     </div>
 </section>
 
@@ -88,18 +142,55 @@
     <div class="flex items-center justify-between px-6 md:px-10 mb-4">
         <h2 class="text-xs font-bold uppercase tracking-widest">Top Genres</h2>
         <a href="/genres?time_range={{ time_range }}"
-           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">
-            See All
-        </a>
+           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">See All</a>
     </div>
-    <div class="flex gap-2 overflow-x-auto px-6 md:px-10 pb-2 scrollbar-hide">
-        {% for genre in top_genres %}
-        <span class="flex-shrink-0 px-3 py-1.5 border rounded-full text-xs font-medium capitalize
-                     {% if loop.index <= 3 %}border-sp-green text-sp-green{% else %}border-white/20 text-sp-muted{% endif %}">
-            {{ genre.name }}
-        </span>
-        {% endfor %}
+    <div class="relative">
+        <button id="genres-left"
+                class="hidden absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10
+                       w-8 h-8 rounded-full bg-sp-black/90 border border-white/20 hover:border-white/50
+                       flex items-center justify-center shadow-lg transition-all duration-200"
+                onclick="scrollSection('genres', -1)">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <div id="genres-scroll"
+             class="flex gap-2 overflow-x-auto px-6 md:px-10 pb-3 scrollbar-hide"
+             onscroll="updateArrows('genres')">
+            {% for genre in top_genres %}
+            <span class="flex-shrink-0 px-3 py-1.5 border rounded-full text-xs font-medium capitalize
+                         {% if loop.index <= 3 %}border-sp-green text-sp-green{% else %}border-white/20 text-sp-muted{% endif %}">
+                {{ genre.name }}
+            </span>
+            {% endfor %}
+        </div>
+        <button id="genres-right"
+                class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10
+                       w-8 h-8 rounded-full bg-sp-black/90 border border-white/20 hover:border-white/50
+                       flex items-center justify-center shadow-lg transition-all duration-200"
+                onclick="scrollSection('genres', 1)">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </button>
     </div>
 </section>
+
+<script>
+    function scrollSection(id, dir) {
+        const el = document.getElementById(id + '-scroll');
+        el.scrollBy({ left: dir * 300, behavior: 'smooth' });
+        setTimeout(() => updateArrows(id), 350);
+    }
+
+    function updateArrows(id) {
+        const el = document.getElementById(id + '-scroll');
+        const left = document.getElementById(id + '-left');
+        const right = document.getElementById(id + '-right');
+        if (!el || !left || !right) return;
+        left.classList.toggle('hidden', el.scrollLeft <= 0);
+        right.classList.toggle('hidden', el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        ['tracks', 'artists', 'albums', 'genres'].forEach(updateArrows);
+    });
+</script>
 
 {% endblock %}

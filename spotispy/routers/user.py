@@ -39,11 +39,13 @@ def _auth_context(request: Request, db: Session):
         db.commit()
 
     user_info = user.user_info
+    user_pfp = user_info["images"][0]["url"] if user_info.get("images") else "https://placehold.co/150"
 
     return Spotify(auth=token_info["access_token"]), {
         "authenticated": True,
         "user_name": user_info.get("display_name", user_id),
         "user_profile_url": user_info.get("external_urls", {}).get("spotify"),
+        "user_pfp": user_pfp,
     }
 
 
