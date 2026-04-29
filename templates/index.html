@@ -3,70 +3,103 @@
 
 {% block content %}
 
-<!-- Compact profile row -->
-<div class="flex items-center gap-6 px-6 md:px-10 py-10">
-    <img src="{{ user_pfp }}" alt="{{ user_name }}"
-         class="w-20 h-20 rounded-full flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
-    <div class="min-w-0">
+<!-- Profile header -->
+<div class="px-6 md:px-10 pt-10 pb-6 flex items-center justify-between gap-4">
+    <div>
         <p class="text-sp-muted text-xs uppercase tracking-widest mb-1">Profile</p>
-        <h1 class="text-3xl font-bold truncate">{{ user_name }}</h1>
-        {% if user_followers is not none %}
-        <p class="text-sp-muted text-sm mt-1">
-            <span class="text-white font-semibold">{{ "{:,}".format(user_followers) }}</span> Followers
-        </p>
-        {% endif %}
+        <h1 class="text-3xl font-bold">{{ user_name }}</h1>
     </div>
+    {% if user_profile_url %}
     <a href="{{ user_profile_url }}" target="_blank"
-       class="ml-auto flex-shrink-0 px-5 py-2 border border-white/30 rounded-full text-xs font-semibold
-              uppercase tracking-widest text-sp-muted hover:border-white hover:text-white transition-colors">
+       class="flex-shrink-0 px-5 py-2 border border-white/30 rounded-full text-xs font-semibold
+              uppercase tracking-widest text-sp-muted hover:border-white hover:text-white transition-colors duration-200">
         Open Spotify
     </a>
+    {% endif %}
 </div>
 
-<!-- Two-column preview -->
-<div class="grid md:grid-cols-2 px-6 md:px-10 pb-10 gap-10">
-
-    <!-- Top Artists -->
-    <div>
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xs font-bold uppercase tracking-widest">Top Artists</h2>
-            <a href="/artists"
-               class="text-xs text-sp-muted hover:text-white uppercase tracking-widest
-                      border border-white/20 hover:border-white/50 px-4 py-1.5 rounded-full transition-colors">
-                See More
-            </a>
-        </div>
-        {% for artist in top_artists %}
-        <div class="flex items-center gap-4 py-3 border-b border-white/5 last:border-0">
-            <img src="{{ artist.images[0].url if artist.images else '' }}"
-                 alt="{{ artist.name }}" class="w-10 h-10 rounded-full flex-shrink-0 object-cover">
-            <p class="text-sm font-medium truncate">{{ artist.name }}</p>
-        </div>
-        {% endfor %}
+<!-- Top Tracks -->
+<section class="mb-8">
+    <div class="flex items-center justify-between px-6 md:px-10 mb-4">
+        <h2 class="text-xs font-bold uppercase tracking-widest">Top Tracks</h2>
+        <a href="/tracks?time_range={{ time_range }}"
+           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">
+            See All
+        </a>
     </div>
-
-    <!-- Top Tracks -->
-    <div>
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xs font-bold uppercase tracking-widest">Top Tracks</h2>
-            <a href="/tracks"
-               class="text-xs text-sp-muted hover:text-white uppercase tracking-widest
-                      border border-white/20 hover:border-white/50 px-4 py-1.5 rounded-full transition-colors">
-                See More
-            </a>
-        </div>
+    <div class="flex gap-4 overflow-x-auto px-6 md:px-10 pb-2 scrollbar-hide">
         {% for track in top_tracks %}
-        <div class="flex items-center gap-4 py-3 border-b border-white/5 last:border-0">
+        <div class="flex-shrink-0 w-32 group cursor-pointer">
             <img src="{{ track.album.images[0].url if track.album.images else '' }}"
-                 alt="{{ track.name }}" class="w-10 h-10 rounded flex-shrink-0 object-cover">
-            <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium truncate">{{ track.name }}</p>
-                <p class="text-xs text-sp-muted truncate mt-0.5">{{ track.artists[0].name }}</p>
-            </div>
+                 alt="{{ track.name }}"
+                 class="w-32 h-32 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
+            <p class="text-xs font-medium truncate">{{ track.name }}</p>
+            <p class="text-[10px] text-sp-muted truncate mt-0.5">{{ track.artists[0].name }}</p>
         </div>
         {% endfor %}
     </div>
+</section>
 
-</div>
+<!-- Top Artists -->
+<section class="mb-8">
+    <div class="flex items-center justify-between px-6 md:px-10 mb-4">
+        <h2 class="text-xs font-bold uppercase tracking-widest">Top Artists</h2>
+        <a href="/artists?time_range={{ time_range }}"
+           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">
+            See All
+        </a>
+    </div>
+    <div class="flex gap-4 overflow-x-auto px-6 md:px-10 pb-2 scrollbar-hide">
+        {% for artist in top_artists %}
+        <div class="flex-shrink-0 w-28 text-center group cursor-pointer">
+            <img src="{{ artist.images[0].url if artist.images else '' }}"
+                 alt="{{ artist.name }}"
+                 class="w-28 h-28 rounded-full object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
+            <p class="text-xs font-medium truncate">{{ artist.name }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Top Albums -->
+<section class="mb-8">
+    <div class="flex items-center justify-between px-6 md:px-10 mb-4">
+        <h2 class="text-xs font-bold uppercase tracking-widest">Top Albums</h2>
+        <a href="/albums?time_range={{ time_range }}"
+           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">
+            See All
+        </a>
+    </div>
+    <div class="flex gap-4 overflow-x-auto px-6 md:px-10 pb-2 scrollbar-hide">
+        {% for album in top_albums %}
+        <div class="flex-shrink-0 w-32 group cursor-pointer">
+            <img src="{{ album.image or '' }}"
+                 alt="{{ album.name }}"
+                 class="w-32 h-32 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
+            <p class="text-xs font-medium truncate">{{ album.name }}</p>
+            <p class="text-[10px] text-sp-muted truncate mt-0.5">{{ album.artist }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Top Genres -->
+<section class="mb-10">
+    <div class="flex items-center justify-between px-6 md:px-10 mb-4">
+        <h2 class="text-xs font-bold uppercase tracking-widest">Top Genres</h2>
+        <a href="/genres?time_range={{ time_range }}"
+           class="text-xs text-sp-muted hover:text-white uppercase tracking-widest transition-colors duration-200">
+            See All
+        </a>
+    </div>
+    <div class="flex gap-2 overflow-x-auto px-6 md:px-10 pb-2 scrollbar-hide">
+        {% for genre in top_genres %}
+        <span class="flex-shrink-0 px-3 py-1.5 border rounded-full text-xs font-medium capitalize
+                     {% if loop.index <= 3 %}border-sp-green text-sp-green{% else %}border-white/20 text-sp-muted{% endif %}">
+            {{ genre.name }}
+        </span>
+        {% endfor %}
+    </div>
+</section>
 
 {% endblock %}

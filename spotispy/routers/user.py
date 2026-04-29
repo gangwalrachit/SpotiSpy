@@ -11,7 +11,7 @@ from spotispy.config import sp_oauth
 from spotispy.database import User, get_db
 
 LIMIT = 50
-PREVIEW_LIMIT = 10
+PREVIEW_LIMIT = 20
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -39,36 +39,38 @@ def _auth_context(request: Request, db: Session):
         db.commit()
 
     user_info = user.user_info
-    user_pfp = "https://placehold.co/150"
-    if user_info.get("images"):
-        user_pfp = user_info["images"][0].get("url", user_pfp)
 
     return Spotify(auth=token_info["access_token"]), {
         "authenticated": True,
         "user_name": user_info.get("display_name", user_id),
         "user_profile_url": user_info.get("external_urls", {}).get("spotify"),
-        "user_pfp": user_pfp,
-        "user_followers": user_info.get("followers", {}).get("total"),
     }
 
 
 @router.get("/", response_class=HTMLResponse)
-async def index(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+async def index(
+    request: Request,
+    time_range: str = "short_term",
+    db: Session = Depends(get_db),
+) -> HTMLResponse:
     sp, ctx = _auth_context(request, db)
     if not sp:
         return _unauth(request)
 
     try:
-        top_tracks = sp.current_user_top_tracks(limit=PREVIEW_LIMIT, time_range="short_term")
-        top_artists = sp.current_user_top_artists(limit=PREVIEW_LIMIT, time_range="short_term")
+        top_tracks_resp = sp.current_user_top_tracks(limit=PREVIEW_LIMIT, time_range=time_range)
+        top_artists_resp = sp.current_user_top_artists(limit=PREVIEW_LIMIT, time_range=time_range)
     except SpotifyException:
         return _unauth(request)
 
     return templates.TemplateResponse("index.html", {
         "request": request,
         **ctx,
-        "top_tracks": top_tracks["items"],
-        "top_artists": top_artists["items"],
+        "top_tracks": top_tracks_resp["items"],
+        "top_artists": top_artists_resp["items"],
+        "top_albums": get_top_albums(top_tracks_resp)[:PREVIEW_LIMIT],
+        "top_genres": get_top_genres(top_artists_resp)[:PREVIEW_LIMIT],
+        "time_range": time_range,
         "active_page": "home",
     })
 

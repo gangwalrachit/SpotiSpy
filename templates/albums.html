@@ -5,12 +5,12 @@
 
 <div class="px-6 md:px-10 py-10">
 
-    <div class="flex flex-col sm:flex-row sm:items-end gap-4 mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-end gap-4 mb-10">
         <h1 class="text-2xl font-bold flex-1">Top Albums</h1>
         <div class="flex gap-6">
             {% for value, label in [("short_term", "4 Weeks"), ("medium_term", "6 Months"), ("long_term", "All Time")] %}
             <a href="/albums?time_range={{ value }}"
-               class="text-sm font-semibold pb-1 transition-colors whitespace-nowrap
+               class="text-sm font-semibold pb-1 transition-colors duration-200 whitespace-nowrap
                       {% if time_range == value %}text-white border-b-2 border-sp-green{% else %}text-sp-muted hover:text-white{% endif %}">
                 {{ label }}
             </a>
@@ -18,17 +18,17 @@
         </div>
     </div>
 
-    {% for album in top_albums %}
-    <div class="flex items-center gap-4 py-3 border-b border-white/5 last:border-0">
-        <span class="text-sp-muted text-sm w-5 text-right flex-shrink-0 tabular-nums select-none">{{ loop.index }}</span>
-        <img src="{{ album.image or '' }}"
-             alt="{{ album.name }}" class="w-10 h-10 rounded flex-shrink-0 object-cover">
-        <div class="min-w-0 flex-1">
-            <p class="font-medium truncate">{{ album.name }}</p>
-            <p class="text-sm text-sp-muted truncate mt-0.5">{{ album.artist }}</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        {% for album in top_albums %}
+        <div class="group cursor-pointer">
+            <img src="{{ album.image or '' }}"
+                 alt="{{ album.name }}"
+                 class="w-full aspect-square rounded object-cover mb-3 group-hover:opacity-80 transition-opacity duration-200">
+            <p class="text-sm font-medium truncate">{{ album.name }}</p>
+            <p class="text-xs text-sp-muted truncate mt-0.5">{{ album.artist }}</p>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 
 </div>
 {% endblock %}
