@@ -43,10 +43,10 @@
              class="flex gap-3 overflow-x-auto px-6 md:px-10 pb-3 scrollbar-hide"
              onscroll="updateArrows('tracks')">
             {% for track in top_tracks %}
-            <div class="flex-shrink-0 w-24 group cursor-pointer">
+            <div class="flex-shrink-0 w-28 group cursor-pointer">
                 <img src="{{ track.album.images[0].url if track.album.images else '' }}"
                      alt="{{ track.name }}"
-                     class="w-24 h-24 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
+                     class="w-28 h-28 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
                 <p class="text-xs font-medium truncate">{{ track.name }}</p>
                 <p class="text-[10px] text-sp-muted truncate mt-0.5">{{ track.artists[0].name }}</p>
             </div>
@@ -81,10 +81,10 @@
              class="flex gap-4 overflow-x-auto px-6 md:px-10 pb-3 scrollbar-hide"
              onscroll="updateArrows('artists')">
             {% for artist in top_artists %}
-            <div class="flex-shrink-0 w-20 text-center group cursor-pointer">
+            <div class="flex-shrink-0 w-24 text-center group cursor-pointer">
                 <img src="{{ artist.images[0].url if artist.images else '' }}"
                      alt="{{ artist.name }}"
-                     class="w-20 h-20 rounded-full object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
+                     class="w-24 h-24 rounded-full object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
                 <p class="text-xs font-medium truncate">{{ artist.name }}</p>
             </div>
             {% endfor %}
@@ -118,10 +118,10 @@
              class="flex gap-3 overflow-x-auto px-6 md:px-10 pb-3 scrollbar-hide"
              onscroll="updateArrows('albums')">
             {% for album in top_albums %}
-            <div class="flex-shrink-0 w-24 group cursor-pointer">
+            <div class="flex-shrink-0 w-28 group cursor-pointer">
                 <img src="{{ album.image or '' }}"
                      alt="{{ album.name }}"
-                     class="w-24 h-24 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
+                     class="w-28 h-28 rounded object-cover mb-2 group-hover:opacity-75 transition-opacity duration-200">
                 <p class="text-xs font-medium truncate">{{ album.name }}</p>
                 <p class="text-[10px] text-sp-muted truncate mt-0.5">{{ album.artist }}</p>
             </div>

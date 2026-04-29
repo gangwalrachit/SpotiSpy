@@ -66,20 +66,6 @@
         {% endfor %}
     </nav>
 
-    <!-- Time range -->
-    <div class="flex flex-col items-center w-full py-3 border-t border-white/10">
-        <p class="text-[9px] text-sp-muted uppercase tracking-widest mb-2">Range</p>
-        <div class="flex gap-1 justify-center">
-            {% for value, short in [("short_term", "4W"), ("medium_term", "6M"), ("long_term", "All")] %}
-            <button onclick="setTimeRange('{{ value }}')"
-                    class="text-[10px] font-bold py-1 px-1.5 rounded transition-all duration-200
-                           {% if (time_range | default('short_term')) == value %}text-sp-green{% else %}text-sp-muted hover:text-white{% endif %}">
-                {{ short }}
-            </button>
-            {% endfor %}
-        </div>
-    </div>
-
     <!-- GitHub + Logout -->
     <div class="flex flex-col items-center gap-3 pt-3 border-t border-white/10 w-full">
         <a href="https://github.com/gangwalrachit/SpotiSpy" target="_blank"
