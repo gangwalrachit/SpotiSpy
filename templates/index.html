@@ -3,30 +3,32 @@
 
 {% block content %}
 
-<!-- Profile hero -->
-<section class="flex flex-col items-center text-center px-6 pt-16 pb-12 border-b border-white/10">
+<!-- Compact profile row -->
+<div class="flex items-center gap-6 px-6 md:px-10 py-10">
     <img src="{{ user_pfp }}" alt="{{ user_name }}"
-         class="w-32 h-32 rounded-full mb-8 shadow-[0_8px_24px_rgba(0,0,0,0.6)]">
-    <p class="text-sp-muted text-xs uppercase tracking-widest mb-3">Profile</p>
-    <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ user_name }}</h1>
-    {% if user_followers is not none %}
-    <p class="text-sp-muted text-sm">
-        <span class="text-white font-bold text-base">{{ "{:,}".format(user_followers) }}</span> Followers
-    </p>
-    {% endif %}
+         class="w-20 h-20 rounded-full flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
+    <div class="min-w-0">
+        <p class="text-sp-muted text-xs uppercase tracking-widest mb-1">Profile</p>
+        <h1 class="text-3xl font-bold truncate">{{ user_name }}</h1>
+        {% if user_followers is not none %}
+        <p class="text-sp-muted text-sm mt-1">
+            <span class="text-white font-semibold">{{ "{:,}".format(user_followers) }}</span> Followers
+        </p>
+        {% endif %}
+    </div>
     <a href="{{ user_profile_url }}" target="_blank"
-       class="mt-6 px-6 py-2 border border-white/30 rounded-full text-xs font-semibold
+       class="ml-auto flex-shrink-0 px-5 py-2 border border-white/30 rounded-full text-xs font-semibold
               uppercase tracking-widest text-sp-muted hover:border-white hover:text-white transition-colors">
         Open Spotify
     </a>
-</section>
+</div>
 
-<!-- Preview: top artists + top tracks side by side -->
-<div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/10">
+<!-- Two-column preview -->
+<div class="grid md:grid-cols-2 px-6 md:px-10 pb-10 gap-10">
 
     <!-- Top Artists -->
-    <div class="px-6 md:px-10 py-10">
-        <div class="flex justify-between items-center mb-6">
+    <div>
+        <div class="flex justify-between items-center mb-5">
             <h2 class="text-xs font-bold uppercase tracking-widest">Top Artists</h2>
             <a href="/artists"
                class="text-xs text-sp-muted hover:text-white uppercase tracking-widest
@@ -44,8 +46,8 @@
     </div>
 
     <!-- Top Tracks -->
-    <div class="px-6 md:px-10 py-10">
-        <div class="flex justify-between items-center mb-6">
+    <div>
+        <div class="flex justify-between items-center mb-5">
             <h2 class="text-xs font-bold uppercase tracking-widest">Top Tracks</h2>
             <a href="/tracks"
                class="text-xs text-sp-muted hover:text-white uppercase tracking-widest
